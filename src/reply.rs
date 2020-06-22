@@ -348,7 +348,11 @@ impl Reply {
             let mut message_builder = MessageBuilder::new();
 
             for (i, c) in self.msg.content.chars().enumerate() {
-                let p = if i % 2 == 0 { c.to_ascii_lowercase() } else { c.to_ascii_uppercase() };
+                let p = if i % 2 == 0 {
+                    c.to_ascii_lowercase()
+                } else {
+                    c.to_ascii_uppercase()
+                };
                 message_builder.push(p);
             }
 
@@ -358,14 +362,19 @@ impl Reply {
 
     fn kool_aid(&self) {
         if self.msg.content == "oh no" {
-            self.send_message("https://thumbs.gfycat.com/ImpartialFairDwarfrabbit-size_restricted.gif");
+            self.send_message(
+                "https://thumbs.gfycat.com/ImpartialFairDwarfrabbit-size_restricted.gif",
+            );
             self.react_with_word("ohyea");
         }
     }
 
     fn bad_bot(&self) {
         if self.msg.content == "bad bot" {
-            let response = MessageBuilder::new().push("fuck you ").mention(&self.msg.author).build();
+            let response = MessageBuilder::new()
+                .push("fuck you ")
+                .mention(&self.msg.author)
+                .build();
 
             self.send_message(response);
         }
@@ -373,7 +382,10 @@ impl Reply {
 
     fn good_bot(&self) {
         if self.msg.content == "good bot" {
-            let response = MessageBuilder::new().push(":blush: aww thanks ").mention(&self.msg.author).build();
+            let response = MessageBuilder::new()
+                .push(":blush: aww thanks ")
+                .mention(&self.msg.author)
+                .build();
 
             self.send_message(response);
         }
