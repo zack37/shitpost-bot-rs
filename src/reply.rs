@@ -278,7 +278,7 @@ impl Reply {
     }
 
     fn random_rizo_reaction(&mut self) {
-        if self.sent_by(users::rizo()) {
+        if self.sent_by(users::rizo()) && self.rng.gen_bool(0.2) {
             match self.rng.gen_range(1, 4) {
                 1 => {
                     self.react_with(emojis::parrot_wave_7());
