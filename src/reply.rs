@@ -12,7 +12,7 @@ use serenity::{
 use std::fmt::Debug;
 
 lazy_static! {
-    static ref MAGA_RE: Regex = Regex::new("ma[dk]e .* great again").unwrap();
+    static ref MAGA_RE: Regex = Regex::new("(?i)ma[dk]e .* great again").unwrap();
 }
 
 pub struct Reply {
@@ -104,19 +104,19 @@ impl Reply {
     fn parrot_wave(&self) {
         if self.msg.content == "🦜" {
             let response = MessageBuilder::new()
-                .push(emojis::format_emoji(&emojis::parrot_wave_7()))
+                .push(&emojis::parrot_wave_7())
                 .push(" ")
-                .push(emojis::format_emoji(&emojis::parrot_wave_6()))
+                .push(&emojis::parrot_wave_6())
                 .push(" ")
-                .push(emojis::format_emoji(&emojis::parrot_wave_5()))
+                .push(&emojis::parrot_wave_5())
                 .push(" ")
-                .push(emojis::format_emoji(&emojis::parrot_wave_4()))
+                .push(&emojis::parrot_wave_4())
                 .push(" ")
-                .push(emojis::format_emoji(&emojis::parrot_wave_3()))
+                .push(&emojis::parrot_wave_3())
                 .push(" ")
-                .push(emojis::format_emoji(&emojis::parrot_wave_2()))
+                .push(&emojis::parrot_wave_2())
                 .push(" ")
-                .push(emojis::format_emoji(&emojis::parrot_wave_1()))
+                .push(&emojis::parrot_wave_1())
                 .build();
 
             self.send_message(response);
@@ -179,23 +179,23 @@ impl Reply {
         }
 
         if self.msg.content.contains("fuck you") {
-            if self.msg.content.contains("aaron") {
+            if self.msg.content.contains("aaron") || self.msg.mentions_user_id(users::aaron()) {
                 self.fuck_aaron();
             }
 
-            if self.msg.content.contains("bacon") {
+            if self.msg.content.contains("bacon") || self.msg.mentions_user_id(users::bacon()) {
                 self.fuck_bacon();
             }
 
-            if self.msg.content.contains("jerran") {
+            if self.msg.content.contains("jerran") || self.msg.mentions_user_id(users::jerran()) {
                 self.fuck_jerran();
             }
 
-            if self.msg.content.contains("rizo") {
+            if self.msg.content.contains("rizo") || self.msg.mentions_user_id(users::rizo()) {
                 self.fuck_rizo();
             }
 
-            if self.msg.content.contains("zack") {
+            if self.msg.content.contains("zack") || self.msg.mentions_user_id(users::zack()) {
                 self.fuck_zack();
             }
         }
@@ -222,7 +222,7 @@ impl Reply {
     }
     fn fuck_jerran(&self) {
         let response = MessageBuilder::new()
-            .push(emojis::format_emoji(&emojis::wendy_parrot()))
+            .push(&emojis::wendy_parrot())
             .push(" ")
             .mention(&users::jerran())
             .push(" 🖕")

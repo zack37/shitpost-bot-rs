@@ -4,8 +4,85 @@ use serenity::model::{
     guild::{Emoji, Role},
     id::EmojiId,
 };
+use std::collections::HashMap;
 
-fn create_emoji(id: EmojiId, name: &str, animated: bool) -> Emoji {
+lazy_static! {
+    static ref EMOJI_MAP: HashMap<&'static str, Emoji> = {
+        let mut m = HashMap::with_capacity(18);
+        m.insert(
+            "zack",
+            create_emoji(EmojiId(401543766084943892), "zack", false),
+        );
+        m.insert(
+            "maga",
+            create_emoji(EmojiId(423325774674788352), "maga", false),
+        );
+        m.insert(
+            "trumpgasm",
+            create_emoji(EmojiId(416058928502276106), "trumpgasm", false),
+        );
+        m.insert(
+            "bepsi",
+            create_emoji(EmojiId(410166385918869504), "bepsi", false),
+        );
+        m.insert(
+            "gkappa",
+            create_emoji(EmojiId(423160844650676244), "gkappa", false),
+        );
+        m.insert(
+            "letsgo",
+            create_emoji(EmojiId(436328704059113475), "letsgo", false),
+        );
+        m.insert(
+            "gzack",
+            create_emoji(EmojiId(610223670123560970), "gzack", false),
+        );
+        m.insert(
+            "party_parrot",
+            create_emoji(EmojiId(397874122232954901), "party_parrot", true),
+        );
+        m.insert(
+            "ultrafastparrot",
+            create_emoji(EmojiId(397874139848769557), "ultrafastparrot", true),
+        );
+        m.insert(
+            "parrotwave7",
+            create_emoji(EmojiId(397874137529319425), "parrotwave7", true),
+        );
+        m.insert(
+            "parrotwave6",
+            create_emoji(EmojiId(397874138959839233), "parrotwave6", true),
+        );
+        m.insert(
+            "parrotwave5",
+            create_emoji(EmojiId(397874134929113088), "parrotwave5", true),
+        );
+        m.insert(
+            "parrotwave4",
+            create_emoji(EmojiId(397874133523890178), "parrotwave4", true),
+        );
+        m.insert(
+            "parrotwave3",
+            create_emoji(EmojiId(397874131539853322), "parrotwave3", true),
+        );
+        m.insert(
+            "parrotwave2",
+            create_emoji(EmojiId(397874132664188930), "parrotwave2", true),
+        );
+        m.insert(
+            "parrotwave1",
+            create_emoji(EmojiId(397874130185093131), "parrotwave1", true),
+        );
+        m.insert(
+            "wendyparrot",
+            create_emoji(EmojiId(399242434300870658), "wendyparrot", true),
+        );
+
+        m
+    };
+}
+
+fn create_emoji(id: EmojiId, name: &'static str, animated: bool) -> Emoji {
     serde_json::from_value::<Emoji>(json!({
         "animated": animated,
         "id": id,
@@ -17,79 +94,72 @@ fn create_emoji(id: EmojiId, name: &str, animated: bool) -> Emoji {
     .unwrap()
 }
 
-pub fn format_emoji(emoji: &Emoji) -> String {
-    let animated_flag = if emoji.animated { "a" } else { "" };
-    let f = format!("<{}:{}:{}>", animated_flag, emoji.name, emoji.id);
-
-    f
-}
-
 pub fn zack() -> Emoji {
-    create_emoji(EmojiId(401543766084943892), "zack", false)
+    EMOJI_MAP["zack"].clone()
 }
 
 pub fn maga() -> Emoji {
-    create_emoji(EmojiId(423325774674788352), "maga", false)
+    EMOJI_MAP["maga"].clone()
 }
 
 pub fn trumpgasm() -> Emoji {
-    create_emoji(EmojiId(416058928502276106), "trumpgasm", false)
+    EMOJI_MAP["trumpgasm"].clone()
 }
 
 pub fn bepsi() -> Emoji {
-    create_emoji(EmojiId(410166385918869504), "bepsi", false)
+    EMOJI_MAP["bepsi"].clone()
 }
 
 pub fn gkappa() -> Emoji {
-    create_emoji(EmojiId(423160844650676244), "gkappa", false)
+    EMOJI_MAP["gkappa"].clone()
 }
 
 pub fn lets_go() -> Emoji {
-    create_emoji(EmojiId(436328704059113475), "letsgo", false)
+    EMOJI_MAP["letsgo"].clone()
 }
 
 pub fn gzack() -> Emoji {
-    create_emoji(EmojiId(610223670123560970), "gzack", false)
+    EMOJI_MAP["gzack"].clone()
 }
 
 pub fn party_parrot() -> Emoji {
-    create_emoji(EmojiId(397874122232954901), "party_parrot", true)
+    EMOJI_MAP["party_parrot"].clone()
 }
 
 pub fn ultra_fast_parrot() -> Emoji {
-    create_emoji(EmojiId(397874139848769557), "ultrafastparrot", true)
+    EMOJI_MAP["ultrafastparrot"].clone()
 }
 
 pub fn parrot_wave_7() -> Emoji {
-    create_emoji(EmojiId(397874137529319425), "parrotwave7", true)
+    EMOJI_MAP["parrotwave7"].clone()
 }
 
 pub fn parrot_wave_6() -> Emoji {
-    create_emoji(EmojiId(397874138959839233), "parrotwave6", true)
+    EMOJI_MAP["parrotwave6"].clone()
 }
 
 pub fn parrot_wave_5() -> Emoji {
-    create_emoji(EmojiId(397874134929113088), "parrotwave5", true)
+    EMOJI_MAP["parrotwave5"].clone()
 }
 
 pub fn parrot_wave_4() -> Emoji {
-    create_emoji(EmojiId(397874133523890178), "parrotwave4", true)
+    EMOJI_MAP["parrotwave4"].clone()
 }
 
 pub fn parrot_wave_3() -> Emoji {
-    create_emoji(EmojiId(397874131539853322), "parrotwave3", true)
+    EMOJI_MAP["parrotwave3"].clone()
 }
 
 pub fn parrot_wave_2() -> Emoji {
-    create_emoji(EmojiId(397874132664188930), "parrotwave2", true)
+    EMOJI_MAP["parrotwave2"].clone()
 }
 
 pub fn parrot_wave_1() -> Emoji {
-    create_emoji(EmojiId(397874130185093131), "parrotwave1", true)
+    EMOJI_MAP["parrotwave1"].clone()
 }
 
 pub fn wendy_parrot() -> Emoji {
-    create_emoji(EmojiId(399242434300870658), "wendyparrot", true)
+    EMOJI_MAP["wendyparrot"].clone()
 }
 
 pub fn letter(key: char) -> ReactionType {

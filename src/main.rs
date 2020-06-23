@@ -9,7 +9,6 @@ use serenity::{
 };
 
 mod emojis;
-// mod replies;
 mod reply;
 mod roles;
 mod users;

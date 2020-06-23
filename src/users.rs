@@ -1,25 +1,47 @@
 use serenity::model::id::UserId;
+use std::collections::HashMap;
 
-pub fn zack() -> UserId {
-    UserId(108568431053246464)
+lazy_static! {
+    static ref USER_ID_MAP: HashMap<&'static str, UserId> = {
+        let mut m = HashMap::with_capacity(6);
+
+        m.insert("aaron", UserId(65055432095301632));
+        m.insert("bacon", UserId(108352053692125184));
+        m.insert("jerran", UserId(189006310501646336));
+        m.insert("mee6", UserId(159985870458322944));
+        m.insert("rizo", UserId(100758264047747072));
+        m.insert("zack", UserId(108568431053246464));
+
+        m
+    };
 }
 
-pub fn rizo() -> UserId {
-    UserId(100758264047747072)
-}
-
-pub fn bacon() -> UserId {
-    UserId(108352053692125184)
-}
-
-pub fn jerran() -> UserId {
-    UserId(189006310501646336)
-}
-
+#[inline]
 pub fn aaron() -> UserId {
-    UserId(65055432095301632)
+    USER_ID_MAP["aaron"]
 }
 
+#[inline]
+pub fn bacon() -> UserId {
+    USER_ID_MAP["bacon"]
+}
+
+#[inline]
+pub fn jerran() -> UserId {
+    USER_ID_MAP["jerran"]
+}
+
+#[inline]
 pub fn mee_6() -> UserId {
-    UserId(159985870458322944)
+    USER_ID_MAP["mee6"]
+}
+
+#[inline]
+pub fn rizo() -> UserId {
+    USER_ID_MAP["rizo"]
+}
+
+#[inline]
+pub fn zack() -> UserId {
+    USER_ID_MAP["zack"]
 }
