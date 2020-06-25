@@ -6,6 +6,7 @@ use serenity::{
     model::{
         channel::{Message, ReactionType},
         id::UserId,
+        guild::Emoji,
     },
     utils::MessageBuilder,
 };
@@ -42,6 +43,7 @@ impl Reply {
         self.maga_react();
         self.rizo_pls();
         self.sick();
+        self.friday();
 
         // simple replies
         self.fuck_you();
@@ -79,6 +81,10 @@ impl Reply {
         if let Err(why) = self.msg.channel_id.say(&self.context.http, content) {
             println!("Error sending message: {:?}", why);
         }
+    }
+
+    fn contains_emoji(&self, emoji: &Emoji) -> bool {
+        self.msg.content.contains(&format!("{}", emoji))
     }
 
     fn sent_by(&self, user_id: UserId) -> bool {
@@ -160,11 +166,7 @@ impl Reply {
     }
 
     fn maga_react(&mut self) {
-        if self
-            .msg
-            .content
-            .contains(&format!("{}", emojis::trumpgasm()))
-        {
+        if self.contains_emoji(&emojis::trumpgasm()) {
             self.react_with(emojis::maga());
         }
     }
@@ -264,7 +266,7 @@ impl Reply {
     }
 
     fn mention_zack(&self) {
-        if self.msg.content.contains(&format!("{}", emojis::zack())) {
+        if self.contains_emoji(&emojis::zack()) {
             let response = MessageBuilder::new().mention(&users::zack()).build();
 
             self.send_message(response);
@@ -322,13 +324,6 @@ impl Reply {
 
     fn henlo(&self) {
         if self.msg.content.contains("henlo") {
-            // let henlo_you = MessageBuilder::new().push("henlo ").mention(&self.msg.author).build();
-            // let henlo_stinky = MessageBuilder::new().push("helllo you STINKY ").mention(&self.msg.author).build();
-            // let go_shitpost = "go shitpost ugly";
-
-            // self.send_message(henlo_you);
-            // self.send_message(henlo_stinky);
-            // self.send_message(go_shitpost);
             let response = MessageBuilder::new()
                 .push("henlo ")
                 .mention(&self.msg.author)
@@ -388,6 +383,12 @@ impl Reply {
                 .build();
 
             self.send_message(response);
+        }
+    }
+
+    fn friday(&self) {
+        if self.contains_emoji(&emojis::friday()) {
+            self.send_message("https://giphy.com/gifs/black-LqzgIzNWDiyFG");
         }
     }
 }

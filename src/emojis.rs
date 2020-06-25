@@ -78,6 +78,11 @@ lazy_static! {
             create_emoji(EmojiId(399242434300870658), "wendyparrot", true),
         );
 
+        m.insert(
+            "friday",
+            create_emoji(EmojiId(461542773741453315), "friday", false),
+        );
+
         m
     };
 }
@@ -160,6 +165,10 @@ pub fn parrot_wave_1() -> Emoji {
 
 pub fn wendy_parrot() -> Emoji {
     EMOJI_MAP["wendyparrot"].clone()
+}
+
+pub fn friday() -> Emoji {
+    EMOJI_MAP["friday"].clone()
 }
 
 pub fn letter(key: char) -> ReactionType {
