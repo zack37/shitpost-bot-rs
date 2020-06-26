@@ -7,6 +7,7 @@ use serenity::{
     model::{channel::Message, gateway::Ready},
     prelude::*,
 };
+use url::Url;
 
 mod emojis;
 mod reply;
@@ -17,7 +18,9 @@ struct Handler;
 
 impl EventHandler for Handler {
     fn message(&self, context: Context, msg: Message) {
-        if msg.author.bot {
+        let host = Url::parse(&msg.content);
+
+        if msg.author.bot || host.is_ok() {
             return;
         }
 
