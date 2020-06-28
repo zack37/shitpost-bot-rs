@@ -2,11 +2,12 @@ use super::*;
 
 use rand::{rngs::ThreadRng, thread_rng, Rng};
 use regex::Regex;
+use serde::Deserialize;
 use serenity::{
     model::{
         channel::{Message, ReactionType},
-        id::UserId,
         guild::Emoji,
+        id::UserId,
     },
     utils::MessageBuilder,
 };
@@ -16,11 +17,19 @@ lazy_static! {
     static ref MAGA_RE: Regex = Regex::new("(?i)ma[dk]e .* great again").unwrap();
 }
 
+#[derive(Deserialize, Debug)]
+struct ApiResponse {
+    url: String,
+}
+
 pub struct Reply {
     context: Context,
     msg: Message,
     rng: ThreadRng,
 }
+
+unsafe impl Send for Reply {}
+unsafe impl Sync for Reply {}
 
 impl Reply {
     pub fn new(context: Context, msg: Message) -> Reply {
@@ -31,7 +40,7 @@ impl Reply {
         }
     }
 
-    pub fn reply(&mut self) {
+    pub fn reply(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         // reaction replies
         self.wendy_parrot();
         self.bepsi();
@@ -44,6 +53,7 @@ impl Reply {
         self.rizo_pls();
         self.sick();
         self.friday();
+        self.dog()?;
 
         // simple replies
         self.fuck_you();
@@ -62,6 +72,8 @@ impl Reply {
         self.parrot_wave();
         self.bad_bot();
         self.good_bot();
+
+        Ok(())
     }
 
     fn react_with_word(&self, word: &str) {
@@ -390,5 +402,21 @@ impl Reply {
         if self.contains_emoji(&emojis::friday()) {
             self.send_message("https://giphy.com/gifs/black-LqzgIzNWDiyFG");
         }
+    }
+
+    fn dog(&self) -> Result<(), reqwest::Error> {
+        let str_triggers = ["bark", "bork", "woof", "🐶"];
+        if &self.msg.content == &format!("{}", emojis::wowee())
+            || str_triggers.iter().any(|&x| x == self.msg.content)
+        {
+            let resp = reqwest::blocking::get(
+                "https://api.thedogapi.com/v1/images/search?mime_types=gif",
+            )?
+            .json::<Vec<ApiResponse>>()?;
+
+            self.send_message(&resp[0].url);
+        }
+
+        Ok(())
     }
 }

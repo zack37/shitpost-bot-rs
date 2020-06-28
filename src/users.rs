@@ -32,7 +32,7 @@ pub fn jerran() -> UserId {
 }
 
 #[inline]
-pub fn mee_6() -> UserId {
+pub fn _mee_6() -> UserId {
     USER_ID_MAP["mee6"]
 }
 

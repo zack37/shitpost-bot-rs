@@ -83,6 +83,11 @@ lazy_static! {
             create_emoji(EmojiId(461542773741453315), "friday", false),
         );
 
+        m.insert(
+            "wowee",
+            create_emoji(EmojiId(530134993226170369), "wowee", false),
+        );
+
         m
     };
 }
@@ -169,6 +174,10 @@ pub fn wendy_parrot() -> Emoji {
 
 pub fn friday() -> Emoji {
     EMOJI_MAP["friday"].clone()
+}
+
+pub fn wowee() -> Emoji {
+    EMOJI_MAP["wowee"].clone()
 }
 
 pub fn letter(key: char) -> ReactionType {

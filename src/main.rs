@@ -1,5 +1,7 @@
 #[macro_use]
 extern crate lazy_static;
+#[macro_use]
+extern crate log;
 
 use std::env;
 
@@ -24,10 +26,13 @@ impl EventHandler for Handler {
             return;
         }
 
-        println!("{:#?}", msg);
+        debug!("{:#?}", msg);
 
         let mut reply = reply::Reply::new(context, msg);
-        reply.reply();
+
+        if let Err(why) = reply.reply() {
+            error!("{:?}", why);
+        }
     }
 
     fn ready(&self, _: Context, ready: Ready) {
@@ -35,11 +40,12 @@ impl EventHandler for Handler {
     }
 }
 
-fn main() {
-    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
-    let mut client = Client::new(&token, Handler).expect("Error creating client");
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    env_logger::init();
+    let token = env::var("DISCORD_TOKEN")?;
+    let mut client = Client::new(&token, Handler)?;
+    client.start()?;
 
-    if let Err(why) = client.start() {
-        println!("Client error: {:?}", why);
-    }
+    Ok(())
 }
