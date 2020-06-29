@@ -1,9 +1,11 @@
 use super::*;
 
-use rand::{rngs::ThreadRng, thread_rng, Rng};
+use emojis::format_emoji;
+use rand::{thread_rng, Rng};
 use regex::Regex;
 use serde::Deserialize;
 use serenity::{
+    futures::try_join,
     model::{
         channel::{Message, ReactionType},
         guild::Emoji,
@@ -25,70 +27,68 @@ struct ApiResponse {
 pub struct Reply {
     context: Context,
     msg: Message,
-    rng: ThreadRng,
 }
 
 type DiscordResult = Result<(), serenity::Error>;
 
 impl Reply {
     pub fn new(context: Context, msg: Message) -> Reply {
-        Reply {
-            context,
-            msg,
-            rng: thread_rng(),
-        }
+        Reply { context, msg }
     }
 
-    pub fn reply(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        // reaction replies
-        self.wendy_parrot()?;
-        self.bepsi()?;
-        self.maga()?;
-        self.gkappa()?;
-        self.gzack()?;
-        self.zack()?;
-        self.trumpgasm()?;
-        self.maga_react()?;
-        self.rizo_pls()?;
-        self.sick()?;
-        self.friday()?;
-        self.dog()?;
-
-        // simple replies
-        self.fuck_you()?;
-        self.steam()?;
-        self.mention_bacon()?;
-        self.mention_zack()?;
-        self.nsa()?;
-
-        // unique replies
-        self.random_rizo_reaction()?;
-        self.summon_adult()?;
-        self.ketsgi()?;
-        self.henlo()?;
-        self.spongebob()?;
-        self.kool_aid()?;
-        self.parrot_wave()?;
-        self.bad_bot()?;
-        self.good_bot()?;
+    pub async fn reply(&self) -> Result<(), Box<dyn std::error::Error>> {
+        try_join!(
+            // reaction replies
+            self.wendy_parrot(),
+            self.bepsi(),
+            self.maga(),
+            self.gkappa(),
+            self.gzack(),
+            self.zack(),
+            self.trumpgasm(),
+            self.maga_react(),
+            self.rizo_pls(),
+            self.sick(),
+            self.friday(),
+            self.dog(),
+            // simple replies
+            self.fuck_you(),
+            self.steam(),
+            self.mention_bacon(),
+            self.mention_zack(),
+            self.nsa(),
+            // unique replies
+            self.random_rizo_reaction(),
+            self.summon_adult(),
+            self.ketsgi(),
+            self.henlo(),
+            self.spongebob(),
+            self.kool_aid(),
+            self.parrot_wave(),
+            self.bad_bot(),
+            self.good_bot(),
+        )?;
 
         Ok(())
     }
 
-    fn react_with_word(&self, word: &str) -> DiscordResult {
+    async fn react_with_word(&self, word: &str) -> DiscordResult {
         for c in word.chars() {
-            self.react_with(emojis::letter(c))?;
+            self.react_with(emojis::letter(c)).await?;
         }
 
         Ok(())
     }
 
-    fn react_with<R: Into<ReactionType> + Debug + Clone>(&self, reaction: R) -> DiscordResult {
-        self.msg.react(&self.context.http, reaction.clone()) 
+    async fn react_with<R: Into<ReactionType> + Debug + Clone>(
+        &self,
+        reaction: R,
+    ) -> DiscordResult {
+        self.msg.react(&self.context.http, reaction.clone()).await
     }
 
-    fn send_message(&self, content: impl std::fmt::Display) -> DiscordResult {
-        let _ = self.msg.channel_id.say(&self.context.http, content)?;
+    async fn send_message(&self, content: impl std::fmt::Display) -> DiscordResult {
+        let _ = self.msg.channel_id.say(&self.context.http, content).await?;
 
         Ok(())
     }
@@ -101,145 +101,147 @@ impl Reply {
         self.msg.author.id == user_id
     }
 
-    fn bepsi(&mut self) -> DiscordResult {
-        if self.sent_by(users::aaron()) && self.rng.gen_bool(0.15) {
-            self.react_with(emojis::bepsi())?;
+    async fn bepsi(&self) -> DiscordResult {
+        if self.sent_by(users::aaron()) && thread_rng().gen_bool(0.15) {
+            self.react_with(emojis::bepsi()).await?;
         }
 
         Ok(())
     }
 
-    fn gkappa(&mut self) -> DiscordResult {
-        if self.rng.gen_bool(0.0005) {
-            self.react_with(emojis::gkappa())?;
+    async fn gkappa(&self) -> DiscordResult {
+        if thread_rng().gen_bool(0.0005) {
+            self.react_with(emojis::gkappa()).await?;
         }
 
         Ok(())
     }
 
-    fn maga(&self) -> DiscordResult {
+    async fn maga(&self) -> DiscordResult {
         if MAGA_RE.is_match(&self.msg.content) {
-            self.react_with(emojis::maga())?;
+            self.react_with(emojis::maga()).await?;
         }
 
         Ok(())
     }
 
-    fn parrot_wave(&self) -> DiscordResult {
+    async fn parrot_wave(&self) -> DiscordResult {
         if self.msg.content == "🦜" {
             let response = MessageBuilder::new()
-                .push(&emojis::parrot_wave_7())
+                .push(format_emoji(&emojis::parrot_wave_7()))
                 .push(" ")
-                .push(&emojis::parrot_wave_6())
+                .push(format_emoji(&emojis::parrot_wave_6()))
                 .push(" ")
-                .push(&emojis::parrot_wave_5())
+                .push(format_emoji(&emojis::parrot_wave_5()))
                 .push(" ")
-                .push(&emojis::parrot_wave_4())
+                .push(format_emoji(&emojis::parrot_wave_4()))
                 .push(" ")
-                .push(&emojis::parrot_wave_3())
+                .push(format_emoji(&emojis::parrot_wave_3()))
                 .push(" ")
-                .push(&emojis::parrot_wave_2())
+                .push(format_emoji(&emojis::parrot_wave_2()))
                 .push(" ")
-                .push(&emojis::parrot_wave_1())
+                .push(format_emoji(&emojis::parrot_wave_1()))
                 .build();
 
-            self.send_message(response)?;
+            self.send_message(response).await?;
         }
 
         Ok(())
     }
 
-    fn rizo_pls(&self) -> DiscordResult {
+    async fn rizo_pls(&self) -> DiscordResult {
         if self.msg.mentions_user_id(users::rizo()) {
-            self.react_with_word("rizopls")?;
+            self.react_with_word("rizopls").await?;
         }
 
         Ok(())
     }
 
-    fn sick(&self) -> DiscordResult {
+    async fn sick(&self) -> DiscordResult {
         if self.msg.content == "🤢" {
-            self.react_with_word("sick")?;
+            self.react_with_word("sick").await?;
         }
 
         Ok(())
     }
 
-    fn wendy_parrot(&mut self) -> DiscordResult {
-        if self.sent_by(users::jerran()) && self.rng.gen_bool(0.2) {
-            self.react_with(emojis::wendy_parrot())?;
+    async fn wendy_parrot(&self) -> DiscordResult {
+        if self.sent_by(users::jerran()) && thread_rng().gen_bool(0.2) {
+            self.react_with(emojis::wendy_parrot()).await?;
         }
 
         Ok(())
     }
 
-    fn gzack(&mut self) -> DiscordResult {
-        if self.sent_by(users::zack()) && self.rng.gen_bool(0.01) {
-            self.react_with(emojis::gzack())?;
+    async fn gzack(&self) -> DiscordResult {
+        if self.sent_by(users::zack()) && thread_rng().gen_bool(0.01) {
+            self.react_with(emojis::gzack()).await?;
         }
 
         Ok(())
     }
 
-    fn zack(&mut self) -> DiscordResult {
-        if self.sent_by(users::zack()) && self.rng.gen_bool(0.2) {
-            self.react_with(emojis::zack())?;
+    async fn zack(&self) -> DiscordResult {
+        if self.sent_by(users::zack()) && thread_rng().gen_bool(0.2) {
+            self.react_with(emojis::zack()).await?;
         }
 
         Ok(())
     }
 
-    fn trumpgasm(&mut self) -> DiscordResult {
+    async fn trumpgasm(&self) -> DiscordResult {
         if self.msg.content.contains(&format!("{}", emojis::maga())) {
-            self.react_with(emojis::trumpgasm())?;
+            self.react_with(emojis::trumpgasm()).await?;
         }
 
         Ok(())
     }
 
-    fn maga_react(&mut self) -> DiscordResult {
+    async fn maga_react(&self) -> DiscordResult {
         if self.contains_emoji(&emojis::trumpgasm()) {
-            self.react_with(emojis::maga())?;
+            self.react_with(emojis::maga()).await?;
         }
 
         Ok(())
     }
 
-    fn fuck_you(&self) -> DiscordResult {
+    async fn fuck_you(&self) -> DiscordResult {
         if self.msg.content == "fuck you all" {
-            self.fuck_aaron()?;
-            self.fuck_bacon()?;
-            self.fuck_jerran()?;
-            self.fuck_rizo()?;
-            self.fuck_zack()?;
+            try_join!(
+                self.fuck_aaron(),
+                self.fuck_bacon(),
+                self.fuck_jerran(),
+                self.fuck_rizo(),
+                self.fuck_zack(),
+            )?;
         }
 
         if self.msg.content.contains("fuck you") {
             if self.msg.content.contains("aaron") || self.msg.mentions_user_id(users::aaron()) {
-                self.fuck_aaron()?;
+                self.fuck_aaron().await?;
             }
 
             if self.msg.content.contains("bacon") || self.msg.mentions_user_id(users::bacon()) {
-                self.fuck_bacon()?;
+                self.fuck_bacon().await?;
             }
 
             if self.msg.content.contains("jerran") || self.msg.mentions_user_id(users::jerran()) {
-                self.fuck_jerran()?;
+                self.fuck_jerran().await?;
             }
 
             if self.msg.content.contains("rizo") || self.msg.mentions_user_id(users::rizo()) {
-                self.fuck_rizo()?;
+                self.fuck_rizo().await?;
             }
 
             if self.msg.content.contains("zack") || self.msg.mentions_user_id(users::zack()) {
-                self.fuck_zack()?;
+                self.fuck_zack().await?;
             }
         }
 
         Ok(())
     }
 
-    fn fuck_aaron(&self) -> DiscordResult {
+    async fn fuck_aaron(&self) -> DiscordResult {
         let response = MessageBuilder::new()
             .emoji(&emojis::bepsi())
             .push(" ")
@@ -247,36 +249,36 @@ impl Reply {
             .push(" 🖕")
             .build();
 
-        self.send_message(response)
+        self.send_message(response).await
     }
-    fn fuck_bacon(&self) -> DiscordResult {
+    async fn fuck_bacon(&self) -> DiscordResult {
         let response = MessageBuilder::new()
             .push("🥓 ")
             .mention(&users::bacon())
             .push(" 🖕")
             .build();
 
-        self.send_message(response)
+        self.send_message(response).await
     }
-    fn fuck_jerran(&self) -> DiscordResult {
+    async fn fuck_jerran(&self) -> DiscordResult {
         let response = MessageBuilder::new()
-            .push(&emojis::wendy_parrot())
+            .push(format_emoji(&emojis::wendy_parrot()))
             .push(" ")
             .mention(&users::jerran())
             .push(" 🖕")
             .build();
 
-        self.send_message(response)
+        self.send_message(response).await
     }
-    fn fuck_rizo(&self) -> DiscordResult {
+    async fn fuck_rizo(&self) -> DiscordResult {
         let response = MessageBuilder::new()
             .mention(&users::rizo())
             .push(" 🖕")
             .build();
 
-        self.send_message(response)
+        self.send_message(response).await
     }
-    fn fuck_zack(&self) -> DiscordResult {
+    async fn fuck_zack(&self) -> DiscordResult {
         let response = MessageBuilder::new()
             .emoji(&emojis::zack())
             .push(" ")
@@ -284,66 +286,71 @@ impl Reply {
             .push(" 🖕")
             .build();
 
-        self.send_message(response)
+        self.send_message(response).await
     }
 
-    fn steam(&self) -> DiscordResult {
+    async fn steam(&self) -> DiscordResult {
         if self.sent_by(users::aaron()) && self.msg.content.contains("store.steampowered.com") {
-            self.send_message("No Aaron, no one wants to buy your steam game")?;
+            self.send_message("No Aaron, no one wants to buy your steam game")
+                .await?;
         }
 
         Ok(())
     }
 
-    fn mention_bacon(&self) -> DiscordResult {
+    async fn mention_bacon(&self) -> DiscordResult {
         if self.msg.content.contains("@🥓") {
             let response = MessageBuilder::new().mention(&users::bacon()).build();
 
-            self.send_message(response)?;
+            self.send_message(response).await?;
         }
 
         Ok(())
     }
 
-    fn mention_zack(&self) -> DiscordResult {
+    async fn mention_zack(&self) -> DiscordResult {
         if self.contains_emoji(&emojis::zack()) {
             let response = MessageBuilder::new().mention(&users::zack()).build();
 
-            self.send_message(response)?;
+            self.send_message(response).await?;
         }
 
         Ok(())
     }
 
-    fn nsa(&self) -> DiscordResult {
+    async fn nsa(&self) -> DiscordResult {
         if self.sent_by(users::rizo()) && self.msg.content.contains("alder") {
-            self.send_message("👁👄👁 but the NSA")?;
+            self.send_message("👁👄👁 but the NSA").await?;
         }
 
         Ok(())
     }
 
-    fn random_rizo_reaction(&mut self) -> DiscordResult {
-        if self.sent_by(users::rizo()) && self.rng.gen_bool(0.2) {
-            match self.rng.gen_range(1, 4) {
+    async fn random_rizo_reaction(&self) -> DiscordResult {
+        let (chance, range) = {
+            let mut rng = thread_rng();
+            (rng.gen_bool(0.2), rng.gen_range(1, 4))
+        };
+        if self.sent_by(users::rizo()) && chance {
+            match range {
                 1 => {
-                    self.react_with(emojis::parrot_wave_7())?;
-                    self.react_with(emojis::parrot_wave_6())?;
-                    self.react_with(emojis::parrot_wave_5())?;
-                    self.react_with(emojis::parrot_wave_4())?;
-                    self.react_with(emojis::parrot_wave_3())?;
-                    self.react_with(emojis::parrot_wave_2())?;
-                    self.react_with(emojis::parrot_wave_1())?;
+                    self.react_with(emojis::parrot_wave_7()).await?;
+                    self.react_with(emojis::parrot_wave_6()).await?;
+                    self.react_with(emojis::parrot_wave_5()).await?;
+                    self.react_with(emojis::parrot_wave_4()).await?;
+                    self.react_with(emojis::parrot_wave_3()).await?;
+                    self.react_with(emojis::parrot_wave_2()).await?;
+                    self.react_with(emojis::parrot_wave_1()).await?;
                 }
-                2 => self.react_with(emojis::ultra_fast_parrot())?,
-                _ => self.react_with(emojis::party_parrot())?,
+                2 => self.react_with(emojis::ultra_fast_parrot()).await?,
+                _ => self.react_with(emojis::party_parrot()).await?,
             };
         }
 
         Ok(())
     }
 
-    fn summon_adult(&self) -> DiscordResult {
+    async fn summon_adult(&self) -> DiscordResult {
         if self.msg.content == "!adult" {
             let mention = MessageBuilder::new().role(&roles::adult()).build();
             let awful_face = MessageBuilder::new()
@@ -352,19 +359,20 @@ impl Reply {
                 .push_line("🤜  🤛")
                 .build();
 
-            self.send_message(mention)?;
-            self.send_message(awful_face)?;
+            self.send_message(mention).await?;
+            self.send_message(awful_face).await?;
         }
 
         Ok(())
     }
 
-    fn ketsgi(&mut self) -> DiscordResult {
+    async fn ketsgi(&self) -> DiscordResult {
+        let range = thread_rng().gen_range(0, 3);
         if self.msg.content.contains("letsgo") || self.msg.content.contains("ketsgi") {
-            match self.rng.gen_range(0, 3) {
-                0 => self.react_with_word("letsgo"),
-                1 => self.react_with_word("ketsgi"),
-                2 => self.react_with(emojis::lets_go()),
+            match range {
+                0 => self.react_with_word("letsgo").await,
+                1 => self.react_with_word("ketsgi").await,
+                2 => self.react_with(emojis::lets_go()).await,
                 _ => Err(serenity::Error::Other("Not possible to be here")),
             }?;
         }
@@ -372,7 +380,7 @@ impl Reply {
         Ok(())
     }
 
-    fn henlo(&self) -> DiscordResult {
+    async fn henlo(&self) -> DiscordResult {
         if self.msg.content.contains("henlo") {
             let response = MessageBuilder::new()
                 .push("henlo ")
@@ -384,14 +392,14 @@ impl Reply {
                 .push("go shitpost ugly")
                 .build();
 
-            self.send_message(response)?;
+            self.send_message(response).await?;
         }
 
         Ok(())
     }
 
-    fn spongebob(&mut self) -> DiscordResult {
-        if self.msg.content.len() >= 10 && self.rng.gen_bool(0.01) {
+    async fn spongebob(&self) -> DiscordResult {
+        if self.msg.content.len() >= 10 && thread_rng().gen_bool(0.01) {
             let mut message_builder = MessageBuilder::new();
 
             for (i, c) in self.msg.content.chars().enumerate() {
@@ -403,68 +411,71 @@ impl Reply {
                 message_builder.push(p);
             }
 
-            self.send_message(message_builder.build())?;
+            self.send_message(message_builder.build()).await?;
         }
 
         Ok(())
     }
 
-    fn kool_aid(&self) -> DiscordResult {
+    async fn kool_aid(&self) -> DiscordResult {
         if self.msg.content == "oh no" {
-            self.send_message(
-                "https://thumbs.gfycat.com/ImpartialFairDwarfrabbit-size_restricted.gif",
+            try_join!(
+                self.send_message(
+                    "https://thumbs.gfycat.com/ImpartialFairDwarfrabbit-size_restricted.gif",
+                ),
+                self.react_with_word("ohyea"),
             )?;
-            self.react_with_word("ohyea")?;
         }
 
         Ok(())
     }
 
-    fn bad_bot(&self) -> DiscordResult {
+    async fn bad_bot(&self) -> DiscordResult {
         if self.msg.content == "bad bot" {
             let response = MessageBuilder::new()
                 .push("fuck you ")
                 .mention(&self.msg.author)
                 .build();
 
-            self.send_message(response)?;
+            self.send_message(response).await?;
         }
 
         Ok(())
     }
 
-    fn good_bot(&self) -> DiscordResult {
+    async fn good_bot(&self) -> DiscordResult {
         if self.msg.content == "good bot" {
             let response = MessageBuilder::new()
                 .push(":blush: aww thanks ")
                 .mention(&self.msg.author)
                 .build();
 
-            self.send_message(response)?;
+            self.send_message(response).await?;
         }
 
         Ok(())
     }
 
-    fn friday(&self) -> DiscordResult {
+    async fn friday(&self) -> DiscordResult {
         if self.contains_emoji(&emojis::friday()) {
-            self.send_message("https://giphy.com/gifs/black-LqzgIzNWDiyFG")?
+            self.send_message("https://giphy.com/gifs/black-LqzgIzNWDiyFG")
+                .await?;
         }
 
         Ok(())
     }
 
-    fn dog(&self) -> Result<(), serenity::Error> {
+    async fn dog(&self) -> Result<(), serenity::Error> {
         let str_triggers = ["bark", "bork", "woof", "🐶"];
         if &self.msg.content == &format!("{}", emojis::wowee())
             || str_triggers.iter().any(|&x| x == self.msg.content)
         {
-            let resp = reqwest::blocking::get(
-                "https://api.thedogapi.com/v1/images/search?mime_types=gif",
-            )?
-            .json::<Vec<ApiResponse>>()?;
+            let resp = reqwest::get("https://api.thedogapi.com/v1/images/search?mime_types=gif")
+                .await?
+                .json::<Vec<ApiResponse>>()
+                .await?;
 
-            self.send_message(&resp[0].url)?;
+            self.send_message(&resp[0].url).await?;
         }
 
         Ok(())

@@ -1,3 +1,4 @@
+#![recursion_limit = "256"]
 #[macro_use]
 extern crate lazy_static;
 #[macro_use]
@@ -6,6 +7,8 @@ extern crate log;
 use std::env;
 
 use serenity::{
+    async_trait,
+    framework::standard::StandardFramework,
     model::{channel::Message, gateway::Ready},
     prelude::*,
 };
@@ -18,8 +21,9 @@ mod users;
 
 struct Handler;
 
+#[async_trait]
 impl EventHandler for Handler {
-    fn message(&self, context: Context, msg: Message) {
+    async fn message(&self, context: Context, msg: Message) {
         let host = Url::parse(&msg.content);
 
         if msg.author.bot || host.is_ok() {
@@ -28,15 +32,15 @@ impl EventHandler for Handler {
 
         debug!("{:#?}", msg);
 
-        let mut reply = reply::Reply::new(context, msg);
+        let reply = reply::Reply::new(context, msg);
 
-        if let Err(why) = reply.reply() {
+        if let Err(why) = reply.reply().await {
             error!("{:?}", why);
         }
     }
 
-    fn ready(&self, _: Context, ready: Ready) {
-        println!("{} is connected!", ready.user.name);
+    async fn ready(&self, _: Context, ready: Ready) {
+        info!("{} is connected!", ready.user.name);
     }
 }
 
@@ -44,8 +48,13 @@ impl EventHandler for Handler {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
     let token = env::var("DISCORD_TOKEN")?;
-    let mut client = Client::new(&token, Handler)?;
-    client.start()?;
+    let mut client = Client::new(&token)
+        .event_handler(Handler)
+        .framework(StandardFramework::new())
+        .await?;
+    if let Err(why) = client.start().await {
+        error!("Error with client: {:?}", why);
+    }
 
     Ok(())
 }

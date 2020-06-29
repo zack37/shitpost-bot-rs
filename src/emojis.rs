@@ -92,6 +92,11 @@ lazy_static! {
     };
 }
 
+pub fn format_emoji(emoji: &Emoji) -> String {
+    let animated_prefix = if emoji.animated { "a" } else { "" };
+    format!("<{}:{}:{}>", animated_prefix, emoji.name, emoji.id)
+}
+
 fn create_emoji(id: EmojiId, name: &'static str, animated: bool) -> Emoji {
     serde_json::from_value::<Emoji>(json!({
         "animated": animated,
@@ -213,3 +218,10 @@ pub fn letter(key: char) -> ReactionType {
 
     ReactionType::Unicode(character.to_string())
 }
+
+// impl std::fmt::Display for Emoji {
+//     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+//         let animated_prefix = if self.animated { "a" } else { "" };
+//         write!(f, "<{}:{}:{}>", animated_prefix, self.name, self.id)
+//     }
+// }
