@@ -4,6 +4,9 @@ edition = "2018"
 name = "shitpost-bot-rs"
 version = "0.1.0"
 
+[profile.release]
+lto="thin"
+
 [dependencies]
 rand = "0.7"
 serde_json = "1.0"

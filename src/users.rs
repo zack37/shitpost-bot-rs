@@ -16,32 +16,26 @@ lazy_static! {
     };
 }
 
-#[inline]
 pub fn aaron() -> UserId {
     USER_ID_MAP["aaron"]
 }
 
-#[inline]
 pub fn bacon() -> UserId {
     USER_ID_MAP["bacon"]
 }
 
-#[inline]
 pub fn jerran() -> UserId {
     USER_ID_MAP["jerran"]
 }
 
-#[inline]
 pub fn _mee_6() -> UserId {
     USER_ID_MAP["mee6"]
 }
 
-#[inline]
 pub fn rizo() -> UserId {
     USER_ID_MAP["rizo"]
 }
 
-#[inline]
 pub fn zack() -> UserId {
     USER_ID_MAP["zack"]
 }

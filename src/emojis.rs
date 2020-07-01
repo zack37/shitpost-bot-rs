@@ -9,34 +9,16 @@ use std::collections::HashMap;
 lazy_static! {
     static ref EMOJI_MAP: HashMap<&'static str, Emoji> = {
         let mut m = HashMap::with_capacity(18);
-        m.insert(
-            "zack",
-            create_emoji(EmojiId(401543766084943892), "zack", false),
-        );
-        m.insert(
-            "maga",
-            create_emoji(EmojiId(423325774674788352), "maga", false),
-        );
+        m.insert("zack", create_emoji(EmojiId(401543766084943892), "zack", false));
+        m.insert("maga", create_emoji(EmojiId(423325774674788352), "maga", false));
         m.insert(
             "trumpgasm",
             create_emoji(EmojiId(416058928502276106), "trumpgasm", false),
         );
-        m.insert(
-            "bepsi",
-            create_emoji(EmojiId(410166385918869504), "bepsi", false),
-        );
-        m.insert(
-            "gkappa",
-            create_emoji(EmojiId(423160844650676244), "gkappa", false),
-        );
-        m.insert(
-            "letsgo",
-            create_emoji(EmojiId(436328704059113475), "letsgo", false),
-        );
-        m.insert(
-            "gzack",
-            create_emoji(EmojiId(610223670123560970), "gzack", false),
-        );
+        m.insert("bepsi", create_emoji(EmojiId(410166385918869504), "bepsi", false));
+        m.insert("gkappa", create_emoji(EmojiId(423160844650676244), "gkappa", false));
+        m.insert("letsgo", create_emoji(EmojiId(436328704059113475), "letsgo", false));
+        m.insert("gzack", create_emoji(EmojiId(610223670123560970), "gzack", false));
         m.insert(
             "party_parrot",
             create_emoji(EmojiId(397874122232954901), "party_parrot", true),
@@ -77,16 +59,8 @@ lazy_static! {
             "wendyparrot",
             create_emoji(EmojiId(399242434300870658), "wendyparrot", true),
         );
-
-        m.insert(
-            "friday",
-            create_emoji(EmojiId(461542773741453315), "friday", false),
-        );
-
-        m.insert(
-            "wowee",
-            create_emoji(EmojiId(530134993226170369), "wowee", false),
-        );
+        m.insert("friday", create_emoji(EmojiId(461542773741453315), "friday", false));
+        m.insert("wowee", create_emoji(EmojiId(530134993226170369), "wowee", false));
 
         m
     };
@@ -218,10 +192,3 @@ pub fn letter(key: char) -> ReactionType {
 
     ReactionType::Unicode(character.to_string())
 }
-
-// impl std::fmt::Display for Emoji {
-//     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-//         let animated_prefix = if self.animated { "a" } else { "" };
-//         write!(f, "<{}:{}:{}>", animated_prefix, self.name, self.id)
-//     }
-// }

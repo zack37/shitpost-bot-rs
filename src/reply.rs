@@ -51,6 +51,7 @@ impl Reply {
             self.sick(),
             self.friday(),
             self.dog(),
+            self.the_architect(),
             // simple replies
             self.fuck_you(),
             self.steam(),
@@ -80,17 +81,22 @@ impl Reply {
         Ok(())
     }
 
-    async fn react_with<R: Into<ReactionType> + Debug + Clone>(
-        &self,
-        reaction: R,
-    ) -> DiscordResult {
+    async fn react_with<R>(&self, reaction: R) -> DiscordResult
+    where
+        R: Into<ReactionType> + Debug + Clone,
+    {
         self.msg.react(&self.context.http, reaction.clone()).await
     }
 
-    async fn send_message(&self, content: impl std::fmt::Display) -> DiscordResult {
-        let _ = self.msg.channel_id.say(&self.context.http, content).await?;
+    async fn send_message<T>(&self, content: T) -> DiscordResult
+    where
+        T: std::fmt::Display,
+    {
+        self.msg.channel_id.say(&self.context.http, content).await.and(Ok(()))
+    }
 
-        Ok(())
+    fn message_contains(&self, msg: impl Into<&'static str>) -> bool {
+        self.msg.content.to_ascii_lowercase().contains(msg.into())
     }
 
     fn contains_emoji(&self, emoji: &Emoji) -> bool {
@@ -190,7 +196,7 @@ impl Reply {
     }
 
     async fn trumpgasm(&self) -> DiscordResult {
-        if self.msg.content.contains(&format!("{}", emojis::maga())) {
+        if self.contains_emoji(&emojis::maga()) {
             self.react_with(emojis::trumpgasm()).await?;
         }
 
@@ -216,24 +222,24 @@ impl Reply {
             )?;
         }
 
-        if self.msg.content.contains("fuck you") {
+        if self.message_contains("fuck you") {
             if self.msg.content.contains("aaron") || self.msg.mentions_user_id(users::aaron()) {
                 self.fuck_aaron().await?;
             }
 
-            if self.msg.content.contains("bacon") || self.msg.mentions_user_id(users::bacon()) {
+            if self.message_contains("bacon") || self.msg.mentions_user_id(users::bacon()) {
                 self.fuck_bacon().await?;
             }
 
-            if self.msg.content.contains("jerran") || self.msg.mentions_user_id(users::jerran()) {
+            if self.message_contains("jerran") || self.msg.mentions_user_id(users::jerran()) {
                 self.fuck_jerran().await?;
             }
 
-            if self.msg.content.contains("rizo") || self.msg.mentions_user_id(users::rizo()) {
+            if self.message_contains("rizo") || self.msg.mentions_user_id(users::rizo()) {
                 self.fuck_rizo().await?;
             }
 
-            if self.msg.content.contains("zack") || self.msg.mentions_user_id(users::zack()) {
+            if self.message_contains("zack") || self.msg.mentions_user_id(users::zack()) {
                 self.fuck_zack().await?;
             }
         }
@@ -271,10 +277,7 @@ impl Reply {
         self.send_message(response).await
     }
     async fn fuck_rizo(&self) -> DiscordResult {
-        let response = MessageBuilder::new()
-            .mention(&users::rizo())
-            .push(" 🖕")
-            .build();
+        let response = MessageBuilder::new().mention(&users::rizo()).push(" 🖕").build();
 
         self.send_message(response).await
     }
@@ -319,7 +322,7 @@ impl Reply {
     }
 
     async fn nsa(&self) -> DiscordResult {
-        if self.sent_by(users::rizo()) && self.msg.content.contains("alder") {
+        if self.sent_by(users::rizo()) && self.message_contains("alder") {
             self.send_message("👁👄👁 but the NSA").await?;
         }
 
@@ -368,7 +371,7 @@ impl Reply {
 
     async fn ketsgi(&self) -> DiscordResult {
         let range = thread_rng().gen_range(0, 3);
-        if self.msg.content.contains("letsgo") || self.msg.content.contains("ketsgi") {
+        if self.message_contains("letsgo") || self.message_contains("ketsgi") {
             match range {
                 0 => self.react_with_word("letsgo").await,
                 1 => self.react_with_word("ketsgi").await,
@@ -381,7 +384,7 @@ impl Reply {
     }
 
     async fn henlo(&self) -> DiscordResult {
-        if self.msg.content.contains("henlo") {
+        if self.message_contains("henlo") {
             let response = MessageBuilder::new()
                 .push("henlo ")
                 .mention(&self.msg.author)
@@ -420,9 +423,7 @@ impl Reply {
     async fn kool_aid(&self) -> DiscordResult {
         if self.msg.content == "oh no" {
             try_join!(
-                self.send_message(
-                    "https://thumbs.gfycat.com/ImpartialFairDwarfrabbit-size_restricted.gif",
-                ),
+                self.send_message("https://thumbs.gfycat.com/ImpartialFairDwarfrabbit-size_restricted.gif",),
                 self.react_with_word("ohyea"),
             )?;
         }
@@ -458,24 +459,31 @@ impl Reply {
 
     async fn friday(&self) -> DiscordResult {
         if self.contains_emoji(&emojis::friday()) {
-            self.send_message("https://giphy.com/gifs/black-LqzgIzNWDiyFG")
-                .await?;
+            self.send_message("https://giphy.com/gifs/black-LqzgIzNWDiyFG").await?;
         }
 
         Ok(())
     }
 
-    async fn dog(&self) -> Result<(), serenity::Error> {
+    async fn dog(&self) -> DiscordResult {
         let str_triggers = ["bark", "bork", "woof", "🐶"];
-        if &self.msg.content == &format!("{}", emojis::wowee())
-            || str_triggers.iter().any(|&x| x == self.msg.content)
-        {
+        if &self.msg.content == &format!("{}", emojis::wowee()) || str_triggers.iter().any(|&x| x == self.msg.content) {
             let resp = reqwest::get("https://api.thedogapi.com/v1/images/search?mime_types=gif")
                 .await?
                 .json::<Vec<ApiResponse>>()
                 .await?;
 
             self.send_message(&resp[0].url).await?;
+        }
+
+        Ok(())
+    }
+
+    async fn the_architect(&self) -> DiscordResult {
+        if self.message_contains("the architect") {
+            let message = "_**T H E   A R C H I T E C T**_";
+
+            self.send_message(message).await?;
         }
 
         Ok(())
