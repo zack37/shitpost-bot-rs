@@ -1,6 +1,5 @@
-use super::*;
-
-use emojis::format_emoji;
+use crate::emojis::format_emoji;
+use crate::{emojis, roles, users};
 use rand::{thread_rng, Rng};
 use regex::Regex;
 use serde::Deserialize;
@@ -11,6 +10,7 @@ use serenity::{
         guild::Emoji,
         id::UserId,
     },
+    prelude::*,
     utils::MessageBuilder,
 };
 use std::fmt::Debug;
@@ -312,7 +312,7 @@ impl Reply {
     }
 
     async fn mention_zack(&self) -> DiscordResult {
-        if self.contains_emoji(&emojis::zack()) {
+        if self.msg.content.contains(&format!("@{}", emojis::zack())) {
             let response = MessageBuilder::new().mention(&users::zack()).build();
 
             self.send_message(response).await?;

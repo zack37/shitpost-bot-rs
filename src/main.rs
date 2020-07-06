@@ -1,11 +1,19 @@
+#![feature(async_closure)]
 #![recursion_limit = "256"]
 #[macro_use]
 extern crate lazy_static;
 #[macro_use]
 extern crate log;
 
+mod emojis;
+mod reply;
+mod roles;
+mod users;
+
 use std::env;
 
+use dotenv::dotenv;
+use reply::Reply;
 use serenity::{
     async_trait,
     framework::standard::StandardFramework,
@@ -13,11 +21,6 @@ use serenity::{
     prelude::*,
 };
 use url::Url;
-
-mod emojis;
-mod reply;
-mod roles;
-mod users;
 
 struct Handler;
 
@@ -32,7 +35,7 @@ impl EventHandler for Handler {
 
         debug!("{:#?}", msg);
 
-        let reply = reply::Reply::new(context, msg);
+        let reply = Reply::new(context, msg);
 
         if let Err(why) = reply.reply().await {
             error!("{:?}", why);
@@ -46,6 +49,7 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    dotenv()?;
     env_logger::init();
     let token = env::var("DISCORD_TOKEN")?;
     let mut client = Client::new(&token)

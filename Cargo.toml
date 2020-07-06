@@ -16,6 +16,7 @@ url = "2.1.1"
 serde = "1.0.114"
 log = "0.4.8"
 env_logger = "0.7.1"
+dotenv = "0.15.0"
 
 [dependencies.serenity]
 git = "https://github.com/Lakelezz/serenity/"
