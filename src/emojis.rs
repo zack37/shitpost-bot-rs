@@ -66,11 +66,6 @@ lazy_static! {
     };
 }
 
-pub fn format_emoji(emoji: &Emoji) -> String {
-    let animated_prefix = if emoji.animated { "a" } else { "" };
-    format!("<{}:{}:{}>", animated_prefix, emoji.name, emoji.id)
-}
-
 fn create_emoji(id: EmojiId, name: &'static str, animated: bool) -> Emoji {
     serde_json::from_value::<Emoji>(json!({
         "animated": animated,

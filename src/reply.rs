@@ -1,7 +1,7 @@
-use crate::emojis::format_emoji;
 use crate::{emojis, roles, users};
 use rand::{thread_rng, Rng};
 use regex::Regex;
+use reqwest::Client;
 use serde::Deserialize;
 use serenity::{
     futures::try_join,
@@ -17,6 +17,15 @@ use std::fmt::Debug;
 
 lazy_static! {
     static ref MAGA_RE: Regex = Regex::new("(?i)ma[dk]e .* great again").unwrap();
+    static ref PARROT_WAVES: Vec<Emoji> = vec![
+        emojis::parrot_wave_7(),
+        emojis::parrot_wave_6(),
+        emojis::parrot_wave_5(),
+        emojis::parrot_wave_4(),
+        emojis::parrot_wave_3(),
+        emojis::parrot_wave_2(),
+        emojis::parrot_wave_1(),
+    ];
 }
 
 #[derive(Deserialize, Debug)]
@@ -27,13 +36,18 @@ struct ApiResponse {
 pub struct Reply {
     context: Context,
     msg: Message,
+    client: Client,
 }
 
 type DiscordResult = Result<(), serenity::Error>;
 
 impl Reply {
     pub fn new(context: Context, msg: Message) -> Reply {
-        Reply { context, msg }
+        Reply {
+            context,
+            msg,
+            client: Client::new(),
+        }
     }
 
     pub async fn reply(&self) -> Result<(), Box<dyn std::error::Error>> {
@@ -85,7 +99,7 @@ impl Reply {
     where
         R: Into<ReactionType> + Debug + Clone,
     {
-        self.msg.react(&self.context.http, reaction.clone()).await
+        self.msg.react(&self.context.http, reaction.clone()).await.and(Ok(()))
     }
 
     async fn send_message<T>(&self, content: T) -> DiscordResult
@@ -133,23 +147,12 @@ impl Reply {
 
     async fn parrot_wave(&self) -> DiscordResult {
         if self.msg.content == "🦜" {
-            let response = MessageBuilder::new()
-                .push(format_emoji(&emojis::parrot_wave_7()))
-                .push(" ")
-                .push(format_emoji(&emojis::parrot_wave_6()))
-                .push(" ")
-                .push(format_emoji(&emojis::parrot_wave_5()))
-                .push(" ")
-                .push(format_emoji(&emojis::parrot_wave_4()))
-                .push(" ")
-                .push(format_emoji(&emojis::parrot_wave_3()))
-                .push(" ")
-                .push(format_emoji(&emojis::parrot_wave_2()))
-                .push(" ")
-                .push(format_emoji(&emojis::parrot_wave_1()))
-                .build();
+            let mut response = MessageBuilder::new();
+            for wave in PARROT_WAVES.clone().into_iter() {
+                response.push(wave).push(" ");
+            }
 
-            self.send_message(response).await?;
+            self.send_message(response.build()).await?;
         }
 
         Ok(())
@@ -268,7 +271,7 @@ impl Reply {
     }
     async fn fuck_jerran(&self) -> DiscordResult {
         let response = MessageBuilder::new()
-            .push(format_emoji(&emojis::wendy_parrot()))
+            .push(&emojis::wendy_parrot())
             .push(" ")
             .mention(&users::jerran())
             .push(" 🖕")
@@ -337,13 +340,9 @@ impl Reply {
         if self.sent_by(users::rizo()) && chance {
             match range {
                 1 => {
-                    self.react_with(emojis::parrot_wave_7()).await?;
-                    self.react_with(emojis::parrot_wave_6()).await?;
-                    self.react_with(emojis::parrot_wave_5()).await?;
-                    self.react_with(emojis::parrot_wave_4()).await?;
-                    self.react_with(emojis::parrot_wave_3()).await?;
-                    self.react_with(emojis::parrot_wave_2()).await?;
-                    self.react_with(emojis::parrot_wave_1()).await?;
+                    for wave in PARROT_WAVES.clone().into_iter() {
+                        self.react_with(wave).await?;
+                    }
                 }
                 2 => self.react_with(emojis::ultra_fast_parrot()).await?,
                 _ => self.react_with(emojis::party_parrot()).await?,
@@ -468,7 +467,10 @@ impl Reply {
     async fn dog(&self) -> DiscordResult {
         let str_triggers = ["bark", "bork", "woof", "🐶"];
         if &self.msg.content == &format!("{}", emojis::wowee()) || str_triggers.iter().any(|&x| x == self.msg.content) {
-            let resp = reqwest::get("https://api.thedogapi.com/v1/images/search?mime_types=gif")
+            let resp = self
+                .client
+                .get("https://api.thedogapi.com/v1/images/search?mime_types=gif")
+                .send()
                 .await?
                 .json::<Vec<ApiResponse>>()
                 .await?;
