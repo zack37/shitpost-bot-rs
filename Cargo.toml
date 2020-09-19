@@ -5,8 +5,9 @@ name = "shitpost-bot-rs"
 version = "0.1.0"
 
 [profile.release]
-lto=true
-panic="abort"
+lto = true
+panic = "abort"
+opt-level = "z"
 
 [dependencies]
 rand = "0.7"
@@ -20,20 +21,18 @@ env_logger = "0.7.1"
 dotenv = "0.15.0"
 
 [dependencies.serenity]
-git = "https://github.com/acdenisSK/serenity/"
-branch = "await_next"
+version = "0.9.0-rc.1"
 default-features = false
 features = [
+  "builder",
   "cache",
+  "collector",
   "client",
-  "gateway",
   "http",
   "model",
-  "rustls_backend",
-  "standard_framework",
-  "utils"
+  "utils",
+  "rustls_backend"
 ]
-
 
 [dependencies.reqwest]
 version = "0.10"

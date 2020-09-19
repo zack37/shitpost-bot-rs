@@ -16,7 +16,6 @@ use dotenv::dotenv;
 use reply::Reply;
 use serenity::{
     async_trait,
-    framework::standard::StandardFramework,
     model::{channel::Message, gateway::Ready},
     prelude::*,
 };
@@ -54,11 +53,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let token = env::var("DISCORD_TOKEN")?;
     let mut client = Client::new(&token)
         .event_handler(Handler)
-        .framework(StandardFramework::new())
         .await?;
-    if let Err(why) = client.start().await {
-        error!("Error with client: {:?}", why);
-    }
+
+    let _ = client.start().await?;
 
     Ok(())
 }
