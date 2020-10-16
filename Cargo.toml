@@ -40,4 +40,4 @@ features = ["json"]
 
 [dependencies.tokio]
 version = "0.3"
-features = ["macros"]
+features = ["macros", "rt-multi-thread"]
