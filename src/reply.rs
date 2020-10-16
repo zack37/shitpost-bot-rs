@@ -82,6 +82,7 @@ impl Reply {
             self.parrot_wave(),
             self.bad_bot(),
             self.good_bot(),
+            self.hype(),
         )?;
 
         Ok(())
@@ -484,6 +485,16 @@ impl Reply {
     async fn the_architect(&self) -> DiscordResult {
         if self.message_contains("the architect") {
             let message = "_**T H E   A R C H I T E C T**_";
+
+            self.send_message(message).await?;
+        }
+
+        Ok(())
+    }
+
+    async fn hype(&self) -> DiscordResult {
+        if self.msg.content.starts_with("!hype") {
+            let message = "https://media.giphy.com/media/b1o4elYH8Tqjm/giphy.gif";
 
             self.send_message(message).await?;
         }

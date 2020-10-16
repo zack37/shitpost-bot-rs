@@ -51,9 +51,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv()?;
     env_logger::init();
     let token = env::var("DISCORD_TOKEN")?;
-    let mut client = Client::new(&token)
-        .event_handler(Handler)
-        .await?;
+    let mut client = Client::new(&token).event_handler(Handler).await?;
 
     let _ = client.start().await?;
 
