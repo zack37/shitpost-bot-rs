@@ -1,4 +1,4 @@
-use crate::{emojis, roles, users};
+use crate::{emojis, users};
 use rand::{thread_rng, Rng};
 use regex::Regex;
 use reqwest::Client;
@@ -74,7 +74,6 @@ impl Reply {
             self.nsa(),
             // unique replies
             self.random_rizo_reaction(),
-            self.summon_adult(),
             self.ketsgi(),
             self.henlo(),
             self.spongebob(),
@@ -82,7 +81,6 @@ impl Reply {
             self.parrot_wave(),
             self.bad_bot(),
             self.good_bot(),
-            self.hype(),
         )?;
 
         Ok(())
@@ -353,22 +351,6 @@ impl Reply {
         Ok(())
     }
 
-    async fn summon_adult(&self) -> DiscordResult {
-        if self.msg.content == "!adult" {
-            let mention = MessageBuilder::new().role(&roles::adult()).build();
-            let awful_face = MessageBuilder::new()
-                .push_line("👁 👁")
-                .push_line("       👄")
-                .push_line("🤜  🤛")
-                .build();
-
-            self.send_message(mention).await?;
-            self.send_message(awful_face).await?;
-        }
-
-        Ok(())
-    }
-
     async fn ketsgi(&self) -> DiscordResult {
         let range = thread_rng().gen_range(0, 3);
         if self.message_contains("letsgo") || self.message_contains("ketsgi") {
@@ -485,16 +467,6 @@ impl Reply {
     async fn the_architect(&self) -> DiscordResult {
         if self.message_contains("the architect") {
             let message = "_**T H E   A R C H I T E C T**_";
-
-            self.send_message(message).await?;
-        }
-
-        Ok(())
-    }
-
-    async fn hype(&self) -> DiscordResult {
-        if self.msg.content.starts_with("!hype") {
-            let message = "https://media.giphy.com/media/b1o4elYH8Tqjm/giphy.gif";
 
             self.send_message(message).await?;
         }
