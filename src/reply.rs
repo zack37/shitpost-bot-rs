@@ -1,10 +1,10 @@
 use crate::{emojis, users};
+use futures::try_join;
 use rand::{thread_rng, Rng};
 use regex::Regex;
 use reqwest::Client;
 use serde::Deserialize;
 use serenity::{
-    futures::try_join,
     model::{
         channel::{Message, ReactionType},
         guild::Emoji,
