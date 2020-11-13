@@ -29,7 +29,7 @@ use url::Url;
 struct Handler;
 
 #[group]
-#[commands(hype, adult)]
+#[commands(hype, adult, version)]
 struct General;
 
 #[async_trait]
@@ -93,6 +93,18 @@ async fn adult(ctx: &Context, msg: &Message) -> CommandResult {
 
     msg.channel_id.say(&ctx, mention).await?;
     msg.channel_id.say(&ctx, awful_face).await?;
+
+    Ok(())
+}
+
+#[command]
+async fn version(ctx: &Context, msg: &Message) -> CommandResult {
+    let message = format!(
+        "You are running version {} of the shittiest posting bot",
+        env!("CARGO_PKG_VERSION")
+    );
+
+    msg.channel_id.say(&ctx, message).await?;
 
     Ok(())
 }
