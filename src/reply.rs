@@ -26,6 +26,7 @@ lazy_static! {
         emojis::parrot_wave_2(),
         emojis::parrot_wave_1(),
     ];
+    static ref DOG_TRIGGERS: [&'static str; 4] = ["bark", "bork", "woof", "🐶"];
 }
 
 #[derive(Deserialize, Debug)]
@@ -334,7 +335,7 @@ impl Reply {
     async fn random_rizo_reaction(&self) -> DiscordResult {
         let (chance, range) = {
             let mut rng = thread_rng();
-            (rng.gen_bool(0.2), rng.gen_range(1, 4))
+            (rng.gen_bool(0.2), rng.gen_range(1..=3))
         };
         if self.sent_by(users::rizo()) && chance {
             match range {
@@ -352,7 +353,7 @@ impl Reply {
     }
 
     async fn ketsgi(&self) -> DiscordResult {
-        let range = thread_rng().gen_range(0, 3);
+        let range = thread_rng().gen_range(0..=2);
         if self.message_contains("letsgo") || self.message_contains("ketsgi") {
             match range {
                 0 => self.react_with_word("letsgo").await,
@@ -448,8 +449,9 @@ impl Reply {
     }
 
     async fn dog(&self) -> DiscordResult {
-        let str_triggers = ["bark", "bork", "woof", "🐶"];
-        if &self.msg.content == &format!("{}", emojis::wowee()) || str_triggers.iter().any(|&x| x == self.msg.content) {
+        let is_wowee = self.msg.content == format!("{}", emojis::wowee());
+        let is_dog_trigger = DOG_TRIGGERS.iter().any(|&x| self.message_contains(x));
+        if is_wowee || is_dog_trigger {
             let resp = self
                 .client
                 .get("https://api.thedogapi.com/v1/images/search?mime_types=gif")
