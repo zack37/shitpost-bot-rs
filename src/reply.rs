@@ -1,7 +1,6 @@
 use crate::{emojis, users};
 use futures::try_join;
 use rand::{thread_rng, Rng};
-use regex::Regex;
 use reqwest::Client;
 use serde::Deserialize;
 use serenity::{
@@ -16,7 +15,6 @@ use serenity::{
 use std::fmt::Debug;
 
 lazy_static! {
-    static ref MAGA_RE: Regex = Regex::new("(?i)ma[dk]e .* great again").unwrap();
     static ref PARROT_WAVES: Vec<Emoji> = vec![
         emojis::parrot_wave_7(),
         emojis::parrot_wave_6(),
@@ -56,12 +54,9 @@ impl Reply {
             // reaction replies
             self.wendy_parrot(),
             self.bepsi(),
-            self.maga(),
             self.gkappa(),
             self.gzack(),
             self.zack(),
-            self.trumpgasm(),
-            self.maga_react(),
             self.rizo_pls(),
             self.sick(),
             self.friday(),
@@ -137,14 +132,6 @@ impl Reply {
         Ok(())
     }
 
-    async fn maga(&self) -> DiscordResult {
-        if MAGA_RE.is_match(&self.msg.content) {
-            self.react_with(emojis::maga()).await?;
-        }
-
-        Ok(())
-    }
-
     async fn parrot_wave(&self) -> DiscordResult {
         if self.msg.content == "🦜" {
             let mut response = MessageBuilder::new();
@@ -193,22 +180,6 @@ impl Reply {
     async fn zack(&self) -> DiscordResult {
         if self.sent_by(users::zack()) && thread_rng().gen_bool(0.2) {
             self.react_with(emojis::zack()).await?;
-        }
-
-        Ok(())
-    }
-
-    async fn trumpgasm(&self) -> DiscordResult {
-        if self.contains_emoji(&emojis::maga()) {
-            self.react_with(emojis::trumpgasm()).await?;
-        }
-
-        Ok(())
-    }
-
-    async fn maga_react(&self) -> DiscordResult {
-        if self.contains_emoji(&emojis::trumpgasm()) {
-            self.react_with(emojis::maga()).await?;
         }
 
         Ok(())

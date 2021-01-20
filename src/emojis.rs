@@ -57,14 +57,6 @@ pub fn zack() -> Emoji {
     EMOJI_MAP["zack"].clone()
 }
 
-pub fn maga() -> Emoji {
-    EMOJI_MAP["maga"].clone()
-}
-
-pub fn trumpgasm() -> Emoji {
-    EMOJI_MAP["trumpgasm"].clone()
-}
-
 pub fn bepsi() -> Emoji {
     EMOJI_MAP["bepsi"].clone()
 }
