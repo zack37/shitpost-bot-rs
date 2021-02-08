@@ -1,6 +1,7 @@
 use crate::{emojis, users};
 use futures::try_join;
 use rand::{thread_rng, Rng};
+use regex::Regex;
 use reqwest::Client;
 use serde::Deserialize;
 use serenity::{
@@ -15,6 +16,7 @@ use serenity::{
 use std::fmt::Debug;
 
 lazy_static! {
+    static ref BLAZE_IT_RE: Regex = Regex::new(r"4[./:]?20").unwrap();
     static ref PARROT_WAVES: Vec<Emoji> = vec![
         emojis::parrot_wave_7(),
         emojis::parrot_wave_6(),
@@ -62,6 +64,7 @@ impl Reply {
             self.friday(),
             self.dog(),
             self.the_architect(),
+            self.blaze_it(),
             // simple replies
             self.fuck_you(),
             self.steam(),
@@ -442,6 +445,14 @@ impl Reply {
             let message = "_**T H E   A R C H I T E C T**_";
 
             self.send_message(message).await?;
+        }
+
+        Ok(())
+    }
+
+    async fn blaze_it(&self) -> DiscordResult {
+        if self.message_contains("blaze it") || BLAZE_IT_RE.is_match(&self.msg.content) {
+            self.react_with(emojis::snoop()).await?;
         }
 
         Ok(())

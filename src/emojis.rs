@@ -48,6 +48,7 @@ lazy_static! {
         m.insert("wendyparrot", create_emoji!(399242434300870658, "wendyparrot", true));
         m.insert("friday", create_emoji!(461542773741453315, "friday"));
         m.insert("wowee", create_emoji!(530134993226170369, "wowee"));
+        m.insert("snoop", create_emoji!(808392623621931028, "snoop"));
 
         m
     };
@@ -119,6 +120,10 @@ pub fn friday() -> Emoji {
 
 pub fn wowee() -> Emoji {
     EMOJI_MAP["wowee"].clone()
+}
+
+pub fn snoop() -> Emoji {
+    EMOJI_MAP["snoop"].clone()
 }
 
 pub fn letter(key: char) -> ReactionType {
