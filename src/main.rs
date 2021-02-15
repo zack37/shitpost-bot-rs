@@ -1,4 +1,3 @@
-#![feature(async_closure)]
 #![recursion_limit = "256"]
 #[macro_use]
 extern crate lazy_static;
@@ -57,7 +56,9 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    dotenv()?;
+    if let Err(_) = dotenv() {
+        println!("no .env file found. Skipping");
+    }
     env_logger::init();
     let token = env::var("DISCORD_TOKEN")?;
     let framework = StandardFramework::new()
@@ -73,8 +74,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+async fn delete_message(ctx: &Context, msg:&Message) -> CommandResult {
+    if let Err(why) = msg.delete(ctx).await {
+        error!("{}", why);
+    }
+
+    Ok(())
+}
+
 #[command]
 async fn hype(ctx: &Context, msg: &Message) -> CommandResult {
+    delete_message(ctx, msg).await?;
     msg.channel_id
         .say(ctx, "https://media.giphy.com/media/b1o4elYH8Tqjm/giphy.gif")
         .await?;
@@ -84,6 +94,7 @@ async fn hype(ctx: &Context, msg: &Message) -> CommandResult {
 
 #[command]
 async fn adult(ctx: &Context, msg: &Message) -> CommandResult {
+    delete_message(ctx, msg).await?;
     let mention = MessageBuilder::new().role(&roles::adult()).build();
     let awful_face = MessageBuilder::new()
         .push_line("👁 👁")
@@ -99,6 +110,7 @@ async fn adult(ctx: &Context, msg: &Message) -> CommandResult {
 
 #[command]
 async fn version(ctx: &Context, msg: &Message) -> CommandResult {
+    delete_message(ctx, msg).await?;
     let message = format!(
         "You are running version {} of the shittiest posting bot",
         env!("CARGO_PKG_VERSION")

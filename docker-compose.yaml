@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  app:
+    build:
+      context: .
+      target: runner
+    volumes:
+      - .:/usr/src/app
+    environment:
+      - RUST_LOG=info
+      - DISCORD_TOKEN_FILE=/run/secrets/discord_token
+    secrets:
+      - discord_token
+
+secrets:
+  discord_token:
+    file: secrets/discord_token.txt

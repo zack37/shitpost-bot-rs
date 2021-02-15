@@ -6,7 +6,6 @@
 # Icon must end with two \r
 Icon
 
-
 # Thumbnails
 ._*
 
@@ -38,3 +37,5 @@ Cargo.lock
 **/*.rs.bk
 
 .env*
+secrets/*
+!secrets/.gitkeep
