@@ -1,4 +1,4 @@
-version: "3.9"
+version: '3.8'
 services:
   app:
     build:
@@ -14,4 +14,4 @@ services:
 
 secrets:
   discord_token:
-    file: secrets/discord_token.txt
+    file: ./secrets/discord_token.txt

@@ -13,6 +13,7 @@ use serenity::{
     prelude::*,
     utils::MessageBuilder,
 };
+use std::collections::HashMap;
 use std::fmt::Debug;
 
 lazy_static! {
@@ -27,6 +28,14 @@ lazy_static! {
         emojis::parrot_wave_1(),
     ];
     static ref DOG_TRIGGERS: [&'static str; 4] = ["bark", "bork", "woof", "🐶"];
+    static ref HES_NOT_YOUR_MAP: HashMap<&'static str, &'static str> = {
+        let mut m = HashMap::new();
+        m.insert("friend", "buddy");
+        m.insert("buddy", "guy");
+        m.insert("guy", "friend");
+
+        m
+    };
 }
 
 #[derive(Deserialize, Debug)]
@@ -65,6 +74,9 @@ impl Reply {
             self.dog(),
             self.the_architect(),
             self.blaze_it(),
+            self.hes_not_your(),
+            self.feels_bad_man(),
+            self.malthor(),
             // simple replies
             self.fuck_you(),
             self.steam(),
@@ -455,6 +467,32 @@ impl Reply {
             self.react_with(emojis::snoop()).await?;
         }
 
+        Ok(())
+    }
+
+    async fn hes_not_your(&self) -> DiscordResult {
+        let trigger_word = HES_NOT_YOUR_MAP.keys().find(|&x| self.message_contains(*x));
+
+        if let Some(trigger) = trigger_word {
+            let output = HES_NOT_YOUR_MAP[trigger];
+            self.send_message(format!("He's not your {}, {}", trigger, output)).await?;
+        }
+
+        Ok(())
+    }
+
+    async fn feels_bad_man(&self) -> DiscordResult {
+        let fbm = emojis::feels_bad_man();
+        if self.contains_emoji(&fbm) {
+            self.react_with(fbm).await?;
+        }
+        Ok(())
+    }
+
+    async fn malthor(&self) -> DiscordResult {
+        if self.message_contains("malthor") {
+            self.send_message("You mean Malthor? The Destroyer?").await?;
+        }
         Ok(())
     }
 }
