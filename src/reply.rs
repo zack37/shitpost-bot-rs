@@ -32,7 +32,6 @@ lazy_static! {
         let mut m = HashMap::new();
         m.insert("friend", "buddy");
         m.insert("buddy", "guy");
-        m.insert("guy", "friend");
 
         m
     };
@@ -475,7 +474,8 @@ impl Reply {
 
         if let Some(trigger) = trigger_word {
             let output = HES_NOT_YOUR_MAP[trigger];
-            self.send_message(format!("He's not your {}, {}", trigger, output)).await?;
+            self.send_message(format!("He's not your {}, {}", trigger, output))
+                .await?;
         }
 
         Ok(())
