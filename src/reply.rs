@@ -426,8 +426,13 @@ impl Reply {
     }
 
     async fn friday(&self) -> DiscordResult {
+        let range = thread_rng().gen_range(0..=1);
         if self.contains_emoji(&emojis::friday()) {
-            self.send_message("https://giphy.com/gifs/black-LqzgIzNWDiyFG").await?;
+            match range {
+                0 => self.send_message("https://giphy.com/gifs/black-LqzgIzNWDiyFG").await,
+                1 => self.send_message("https://www.youtube.com/watch?v=1AnG04qnLqI").await,
+                _ => Err(serenity::Error::Other("Not possible to be here")),
+            }?;
         }
 
         Ok(())

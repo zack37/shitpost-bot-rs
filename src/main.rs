@@ -74,7 +74,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-async fn delete_message(ctx: &Context, msg:&Message) -> CommandResult {
+async fn delete_message(ctx: &Context, msg: &Message) -> CommandResult {
     if let Err(why) = msg.delete(ctx).await {
         error!("{}", why);
     }
@@ -117,6 +117,16 @@ async fn version(ctx: &Context, msg: &Message) -> CommandResult {
     );
 
     msg.channel_id.say(&ctx, message).await?;
+
+    Ok(())
+}
+
+#[command]
+async fn mufasa(ctx: &Context, msg: &Message) -> CommandResult {
+    delete_message(ctx, msg).await?;
+    msg.channel_id
+        .say(&ctx, "https://www.youtube.com/watch?v=1AnG04qnLqI")
+        .await?;
 
     Ok(())
 }
