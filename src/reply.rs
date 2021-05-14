@@ -150,7 +150,7 @@ impl Reply {
         if self.msg.content == "🦜" {
             let mut response = MessageBuilder::new();
             for wave in PARROT_WAVES.clone().into_iter() {
-                response.push(wave).push(" ");
+                response.emoji(&wave).push(" ");
             }
 
             self.send_message(response.build()).await?;

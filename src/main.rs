@@ -125,7 +125,7 @@ async fn version(ctx: &Context, msg: &Message) -> CommandResult {
 async fn mufasa(ctx: &Context, msg: &Message) -> CommandResult {
     delete_message(ctx, msg).await?;
     msg.channel_id
-        .say(&ctx, "https://www.youtube.com/watch?v=1AnG04qnLqI")
+        .say(ctx, "https://www.youtube.com/watch?v=1AnG04qnLqI")
         .await?;
 
     Ok(())
