@@ -2,7 +2,7 @@
 authors = ["Zack Smith <zack.t.smith37@gmail.com>"]
 edition = "2018"
 name = "shitpost-bot-rs"
-version = "1.4.1"
+version = "1.4.2"
 
 [profile.release]
 lto = true
