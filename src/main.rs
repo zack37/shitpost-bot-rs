@@ -28,7 +28,7 @@ use url::Url;
 struct Handler;
 
 #[group]
-#[commands(hype, adult, version)]
+#[commands(hype, adult, version, mufasa)]
 struct General;
 
 #[async_trait]
